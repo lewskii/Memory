@@ -27,10 +27,6 @@ def checknum(msg, errmsg=None, division=False, divzeromsg=None, forceint=False, 
     return num
 
 
-def sign(date):
-    print('\n Made by Leevi Aaltonen \n\n', date)
-
-
 def clear():
     import os
     os.system('cls' if os.name == 'nt' else 'clear')
