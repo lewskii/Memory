@@ -1,5 +1,12 @@
+# created by PyCharm
 .idea
+
+# these don't need to be in the repo but are part of the project
 *.docx
 *.pdf
-checklist.txt
+
+# as the name implies, it's used for testing and isn't needed in the repo
 test.py
+
+# files created by the game
+*.score
