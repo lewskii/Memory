@@ -2,21 +2,22 @@ from tkinter import *       # GUI tools
 from tkinter import ttk     # GUI tools
 from random import randrange  #
 
-
 window = Tk()  # create the main window
 window.title('Memory')  # set the window's title
 mainframe = ttk.Frame(window, padding='5 5 10 10')  # create a frame inside the main window
 mainframe.grid(column=0, row=0, sticky=(N, W, E, S))  # make a grid inside the frame to position widgets
 
 
-def scoreconv():
-    dscore.set('Score: ' + str(score))
+def start():
+    dstring.set('')  # sets the displayed string to nothing to hide it
+    entry['state'] = 'enabled'  # enables the answer field (disabled at the beginning)
+    entry.focus_set()  # sets focus to the answer field
 
 
-def check():
+def check(ans):
     global string
     global score
-    if answer.get() == string:
+    if ans == string:
         string += str(randrange(0, 10))  # adds another random number to the string
         dstring.set(string)  # assigns the new string to the displayed string
         answer.set('')  # empties the answer field
@@ -24,13 +25,16 @@ def check():
         score += 100  # adds 100 to the score
         scoreconv()  # sets the score display to display the new score
     else:
-        toptext.set('Game over!')
+        end()
 
 
-def start():
-    dstring.set('')  # sets the displayed string to nothing to hide it
-    entry['state'] = 'enabled'  # enables the answer field (disabled at the beginning)
-    entry.focus_set()  # sets focus to the answer field
+def end():
+    toptext.set('Game over!')
+
+
+
+def scoreconv():
+    dscore.set('Score: ' + str(score))
 
 
 # StringVar() allows the variables to change globally
@@ -68,11 +72,14 @@ startbutton = ttk.Button(mainframe, text='Start', command=start).grid(column=2, 
 entry = ttk.Entry(mainframe, textvariable=answer, font='TkTextFont', exportselection=0, state='disabled')
 entry.grid(row=3, columnspan=2, sticky='w')  # positions the entry field (didn't fit on the same line as creating it)
 # checks if the string is correct when pressed
-enter = ttk.Button(mainframe, text='Enter', command=check).grid(column=2, row=3)
+entrybutton = ttk.Button(mainframe, text='Enter', command=lambda: check(answer.get())).grid(column=2, row=3)
 
 
 # adds space between all widgets
 for child in mainframe.winfo_children():
     child.grid_configure(padx=5, pady=5)
+
+
+entry.bind('<Return>', lambda c: check(answer.get()))
 
 window.mainloop()  # starts the main event loop
