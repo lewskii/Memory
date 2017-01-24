@@ -12,4 +12,4 @@ __pycache__
 test.py
 
 # created by the game
-*.score
+scores/*.score
