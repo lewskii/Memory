@@ -5,7 +5,7 @@ from random import randrange  #
 mainwindow = Tk()  # create the main window
 mainwindow.title('Games')  # set the window's title
 mainframe = ttk.Frame(mainwindow, padding='5 5 10 5')  # create a frame inside the main window
-mainframe.grid(row=0, sticky=(N, W, E, S))  # make a grid inside the frame to position widgets
+mainframe.grid(row=0, sticky=(N, W, E, S))  # make the frame fill the window
 
 
 def start():
@@ -28,29 +28,55 @@ def memorynext():
     dstring.set(string)  # assigns the new string to the displayed string
     answer.set('')  # empties the answer field
     ansentry['state'] = 'disabled'  # disables the answer field
-    score += 100  # adds 100 to the score
-    scoreconv()  # sets the score display to display the new score
+    score += 1  # adds 1 to the score
+    dscore.set('Levels passed: ' + str(score))  # converts the score into a string with more clarity
 
 
 def end():
-    toptext.set('Game over!')
+    # chooses the correct form of the word "level"
+    if score == 1:
+        levelstr = ' level.'
+    else:
+        levelstr = ' levels.'
+
+    endtext = 'Game over! You passed ' + str(score) + levelstr  # sets the text to change to
+    toptext.set(endtext)  # changes the text
+
+    # with open(name + '.score', 'x', )
 
 
-def scoreconv():
-    dscore.set('Score: ' + str(score))  # converts the score into a string with more clarity
-
-
-def saveuser(name):
-    try:
-        scorefile = open(name + '.score', 'x', )  # creates a file for the player's scores
-    except FileExistsError:
-        scorefile = open(name + '.score', 'a')  # opens the given user's score file if it already exists
-    menu()  # replaces the username entry screen with the main menu
-
-
+# creates space between all widgets in the frame with the given name (must follow naming convention)
 def spacing(frame):
     exec('for child in ' + frame + 'frame.winfo_children(): child.grid_configure(padx=5, pady=5)')
-    # creates space between all widgets
+
+
+def menu():
+    try:
+        open(user.get() + '.score', 'x', )  # creates a file for the player's scores
+    except FileExistsError:
+        pass  # does nothing if the file exists
+
+    mainframe.destroy()
+
+    global menuframe  # lets the variable be used in all functions
+    menuframe = ttk.Frame(mainwindow, padding='5 5 10 10')  # creates a new frame inside the main window
+    menuframe.grid(row=0, sticky=(N, W, E, S))  # make the frame fill the window
+    ttk.Label(menuframe, text='User').grid(row=0)  # labels the user options
+    ttk.Label(menuframe, textvariable=user).grid(row=1)  # displays the current username
+    ttk.Label(menuframe, text='Games').grid(row=0, column=1, columnspan=2)  # labels the game options
+
+    # not yet functional
+    scorebutton = ttk.Button(menuframe, text='Scores', state='disabled')  # displays scores
+    scorebutton.grid(row=2)  # positions the button
+    logoutbutton = ttk.Button(menuframe, text='Log out', state='disabled')  # allows changing username
+    logoutbutton.grid(row=3)  # positions the button
+
+    ttk.Label(menuframe, text='Memory').grid(row=1, column=1)  # label the memory options
+    ttk.Button(menuframe, text='Play', command=memory).grid(row=2, column=1)  # launches the memory game
+    # not yet functional
+    ttk.Button(menuframe, text='Highscores', state='disabled').grid(row=3, column=1)  # shows the game's highscores
+
+    spacing('menu')  # creates space between all widgets
 
 
 user = StringVar()
@@ -62,7 +88,7 @@ userentry.focus_set()  # sets focus to the username entry field
 userentry.grid(row=0, column=1, sticky='w')  # positions the username entry field
 
 # calls the function to create a file for storing the player's scores
-userentrybutton = ttk.Button(mainframe, text='Continue', command=lambda u: saveuser(user.get()))
+userentrybutton = ttk.Button(mainframe, text='Continue', command=menu)
 userentrybutton.grid(row=0, column=2, sticky='w')
 
 # my signature
@@ -72,33 +98,23 @@ signature.grid(row=3, columnspan=3, sticky='sw')  # positions the signature
 
 spacing('main')  # creates space between all widgets
 
-userentry.bind('<Return>', lambda u: saveuser(user.get()))  # binds Enter to the score file creation function
-
-
-def menu():
-    mainframe.destroy()
-
-    menuframe = ttk.Frame(mainwindow, padding='5 5 10 10')  # create a frame inside the main window
-    menuframe.grid(row=0, sticky=(N, W, E, S))  # make a grid inside the frame to position widgets
-    ttk.Label(menuframe, textvariable=user).grid(row=0)
-
-    ttk.Label(menuframe, text='Memory').grid(row=0, column=1)
-    ttk.Button(menuframe, text='Play').grid(row=1, column=1)
+userentry.bind('<Return>', lambda u: menu())  # binds Enter to the score file creation function
 
 
 # memory game
 def memory():
-    global string
+    global string  # lets the variable be used in all functions
     global dstring
     global score
     global dscore
     global toptext
     global answer
     global ansentry
+    global memoryframe
     memorywindow = Toplevel()  # creates the child window for the memory game
     memorywindow.title('Memory')  # sets the window's title
     memoryframe = ttk.Frame(memorywindow, padding='5 5 10 10')  # create a frame inside the main window
-    memoryframe.grid(row=0, sticky=(N, W, E, S))  # make a grid inside the frame to position widgets
+    memoryframe.grid(row=0, sticky=(N, W, E, S))  # make the frame fill the window
 
     # StringVar() allows the variables to change globally
     toptext = StringVar()  # the text displayed at the top of the page
@@ -113,7 +129,7 @@ def memory():
 
     toptext.set('Memorize and enter the numbers.\nPress Start to begin each round.')
     dstring.set(string)  # sets the displayed string
-    scoreconv()  # call the function to set the displayed score
+    dscore.set('Levels passed: ' + str(score))  # converts the score into a string with more clarity
 
     # displays the game's instructions
     ttk.Label(memoryframe, textvariable=toptext, font='TkHeadingFont').grid(row=0, columnspan=3, sticky='w')
