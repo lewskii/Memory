@@ -45,6 +45,7 @@ def saveuser(name):
         scorefile = open(name + '.score', 'x', )  # creates a file for the player's scores
     except FileExistsError:
         scorefile = open(name + '.score', 'a')  # opens the given user's score file if it already exists
+    menu()  # replaces the username entry screen with the main menu
 
 
 def spacing(frame):
@@ -55,19 +56,19 @@ def spacing(frame):
 user = StringVar()
 
 # allows the user to enter a username
-userlabel = ttk.Label(mainframe, text='Enter a username:').grid(row=1, sticky='e')  # labels the username entry field
+userlabel = ttk.Label(mainframe, text='Enter a username:').grid(row=0, sticky='e')  # labels the username entry field
 userentry = ttk.Entry(mainframe, textvariable=user)  # creates the username entry field
 userentry.focus_set()  # sets focus to the username entry field
-userentry.grid(row=1, column=1, sticky='w')  # positions the username entry field
+userentry.grid(row=0, column=1, sticky='w')  # positions the username entry field
 
 # calls the function to create a file for storing the player's scores
 userentrybutton = ttk.Button(mainframe, text='Continue', command=lambda u: saveuser(user.get()))
-userentrybutton.grid(row=1, column=2, sticky='w')
+userentrybutton.grid(row=0, column=2, sticky='w')
 
 # my signature
 signaturetext = 'Made by Leevi Aaltonen, 2017, released under MIT license.'  # the text is long so created a variable
 signature = ttk.Label(mainframe, text=signaturetext, font='TkSmallCaptionFont')  # displays the signature
-signature.grid(row=4, columnspan=3, sticky='sw')  # positions the signature
+signature.grid(row=3, columnspan=3, sticky='sw')  # positions the signature
 
 spacing('main')  # creates space between all widgets
 
@@ -75,16 +76,23 @@ userentry.bind('<Return>', lambda u: saveuser(user.get()))  # binds Enter to the
 
 
 def menu():
+    mainframe.destroy()
 
+    menuframe = ttk.Frame(mainwindow, padding='5 5 10 10')  # create a frame inside the main window
+    menuframe.grid(row=0, sticky=(N, W, E, S))  # make a grid inside the frame to position widgets
+    ttk.Label(menuframe, textvariable=user).grid(row=0)
+
+    ttk.Label(menuframe, text='Memory').grid(row=0, column=1)
+    ttk.Button(menuframe, text='Play').grid(row=1, column=1)
 
 
 # memory game
 def memory():
     global string
-    global score
-    global toptext
     global dstring
+    global score
     global dscore
+    global toptext
     global answer
     global ansentry
     memorywindow = Toplevel()  # creates the child window for the memory game
@@ -108,23 +116,23 @@ def memory():
     scoreconv()  # call the function to set the displayed score
 
     # displays the game's instructions
-    ttk.Label(memoryframe, textvariable=toptext, font='TkHeadingFont').grid(row=1, columnspan=3, sticky='w')
+    ttk.Label(memoryframe, textvariable=toptext, font='TkHeadingFont').grid(row=0, columnspan=3, sticky='w')
 
     # displays the string
-    ttk.Label(memoryframe, textvariable=dstring, font='TkTextFont').grid(row=2, columnspan=2, sticky='w')
+    ttk.Label(memoryframe, textvariable=dstring, font='TkTextFont').grid(row=1, columnspan=2, sticky='w')
     # displays the score
-    ttk.Label(memoryframe, textvariable=dscore, font='TkTextFont').grid(row=4, sticky='w')
+    ttk.Label(memoryframe, textvariable=dscore, font='TkTextFont').grid(row=3, sticky='w')
 
     # hides the string and enables the answer field
-    ttk.Button(memoryframe, text='Start', command=start).grid(column=2, row=2)
+    ttk.Button(memoryframe, text='Start', command=start).grid(column=2, row=1)
 
     # allows the player to enter the string
     ansentry = ttk.Entry(memoryframe, textvariable=answer, font='TkTextFont', exportselection=0, state='disabled')
-    ansentry.grid(row=3, columnspan=2, sticky='w')  # positions the entry field
+    ansentry.grid(row=2, columnspan=2, sticky='w')  # positions the entry field
 
     # checks if the string is correct when pressed
     ansentrybutton = ttk.Button(memoryframe, text='Enter', command=lambda: check('memory', answer.get()))
-    ansentrybutton.grid(column=2, row=3)
+    ansentrybutton.grid(column=2, row=2)
 
     # adds space between all widgets
 
