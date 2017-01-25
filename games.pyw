@@ -11,38 +11,53 @@ def login():
     except NameError:
         pass
 
-    global mainframe
-    mainframe = ttk.Frame(mainwindow, padding='5 5 10 5')  # create a frame inside the main window
-    mainframe.grid(row=0, sticky=(N, W, E, S))  # make the frame fill the window
+    global loginframe  # allows the variable to be used in all functions
+    loginframe = ttk.Frame(mainwindow, padding='5 5 10 5')  # create a frame inside the main window
+    loginframe.grid(row=0, sticky=(N, W, E, S))  # make the frame fill the window
 
     global user
-    user = StringVar()
+    user = StringVar()  # the username, StringVar() allows the variable to change globally
+    user.trace_variable('w', charlimit)
+
+    # tells the user the characters that can't be used in the username
+    badcharlabel = ttk.Label(loginframe, text='Username cannot contain characters / \\ : * ? " < > |')
+    badcharlabel.grid(row=0, columnspan=3, sticky='w')  # positions the label
 
     # allows the user to enter a username
-    ttk.Label(mainframe, text='Enter a username:').grid(row=0, sticky='e')  # labels the username entry field
-    userentry = ttk.Entry(mainframe, textvariable=user)  # creates the username entry field
+    ttk.Label(loginframe, text='Enter a username:').grid(row=1, sticky='e')  # labels the username entry field
+    userentry = ttk.Entry(loginframe, textvariable=user)  # creates the username entry field
     userentry.focus_set()  # sets focus to the username entry field
-    userentry.grid(row=0, column=1, sticky='w')  # positions the username entry field
+    userentry.grid(row=1, column=1, sticky='w')  # positions the username entry field
 
-    # calls the function to create a file for storing the player's scores
-    userentrybutton = ttk.Button(mainframe, text='Continue', command=lambda: menu(menu))
-    userentrybutton.grid(row=0, column=2, sticky='w')
+    # creates the main menu
+    userentrybutton = ttk.Button(loginframe, text='Continue', command=lambda: checkname(user.get()))
+    userentrybutton.grid(row=1, column=2, sticky='w')
 
     # my signature
     signaturetext = 'Made by Leevi Aaltonen, 2017, released under MIT license.'  # created variable because text is long
-    signature = ttk.Label(mainframe, text=signaturetext, font='TkSmallCaptionFont')  # displays the signature
-    signature.grid(row=3, columnspan=3, sticky='sw')  # positions the signature
+    signature = ttk.Label(loginframe, text=signaturetext, font='TkSmallCaptionFont')  # displays the signature
+    signature.grid(row=2, columnspan=3, sticky='sw')  # positions the signature
 
-    spacing('main')  # creates space between all widgets
+    spacing('login')  # creates space between all widgets
 
-    userentry.bind('<Return>', menu)  # binds Enter to the menu function
+    userentry.bind('<Return>', lambda cn: checkname(user.get()))  # binds Enter to the menu function
+
+
+def charlimit(*args):
+    s = user.get()
+    if len(s) > 16:
+        user.set(s[:16])
+
+
+def checkname(name):
+    badchars = ['/', '\\', '*', '?', ':', '"', '<', '>', '|']  # these characters can't be used in filenames
+    if set(name).isdisjoint(badchars):
+        menu()  # creates the menu if the username doesn't contain any bad characters
 
 
 # creates the main menu
-def menu(self):
-    global mainframe
-
-    mainframe.destroy()
+def menu():
+    loginframe.destroy()
 
     global menuframe  # lets the variable be used in all functions
     menuframe = ttk.Frame(mainwindow, padding='5 5 10 10')  # creates a new frame inside the main window
@@ -82,7 +97,6 @@ def memory():
     memoryframe = ttk.Frame(memorywindow, padding='5 5 10 10')  # create a frame inside the main window
     memoryframe.grid(row=0, sticky=(N, W, E, S))  # make the frame fill the window
 
-    # StringVar() allows the variables to change globally
     toptext = StringVar()  # the text displayed at the top of the page
 
     dstring = StringVar()  # the displayed string; emptied when the player presses Start
@@ -107,7 +121,7 @@ def memory():
 
     # hides the string and enables the answer field and check button
     global startbutton
-    startbutton = ttk.Button(memoryframe, text='Start', command=lambda: memorystart(''))
+    startbutton = ttk.Button(memoryframe, text='Start', command=memorystart)
     startbutton.grid(column=2, row=1)  # positions the start button
 
     # allows the player to enter the string
@@ -119,7 +133,7 @@ def memory():
     checkbutton = ttk.Button(memoryframe, text='Enter', command=lambda: check('memory'), state='disabled')
     checkbutton.grid(column=2, row=2)
 
-    memorywindow.bind('<space>', memorystart)
+    memorywindow.bind('<space>', lambda s: memorystart())
     ansentry.bind('<Return>', lambda c: check('memory'))  # calls the check function when Enter is pressed
 
     spacing('memory')  # creates space between all widgets
@@ -131,7 +145,7 @@ def spacing(frame):
 
 
 # starts a memory game round
-def memorystart(self):
+def memorystart():
     dstring.set('')  # sets the displayed string to nothing to hide it
     ansentry['state'] = 'enabled'  # enables the answer field (disabled at the beginning)
     ansentry.focus_set()  # sets focus to the answer field
