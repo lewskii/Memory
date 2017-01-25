@@ -1,6 +1,7 @@
 from tkinter import *       # GUI tools
 from tkinter import ttk     # GUI tools
-from random import randrange  #
+from random import randrange  # returns a random integer in a given range
+from os import makedirs  # creates a directory
 
 
 # creates the login screen
@@ -24,7 +25,7 @@ def login():
     userentry.grid(row=0, column=1, sticky='w')  # positions the username entry field
 
     # calls the function to create a file for storing the player's scores
-    userentrybutton = ttk.Button(mainframe, text='Continue', command=menu)
+    userentrybutton = ttk.Button(mainframe, text='Continue', command=lambda: menu(menu))
     userentrybutton.grid(row=0, column=2, sticky='w')
 
     # my signature
@@ -39,12 +40,6 @@ def login():
 
 # creates the main menu
 def menu(self):
-    """
-    try:
-        open('scores/' + user.get() + '.score', 'x', )  # creates a file for the player's scores
-    except FileExistsError:
-        pass  # does nothing if the file exists
-    """
     global mainframe
 
     mainframe.destroy()
@@ -82,7 +77,8 @@ def memory():
     global memoryframe
     memorywindow = Toplevel()  # creates the child window for the memory game
     memorywindow.title('Memory')  # sets the window's title
-    memorywindow.focus_set()
+    memorywindow.focus_set()  # sets focus to the window
+    memorywindow.resizable(0, 0)  # disables resizing of the window
     memoryframe = ttk.Frame(memorywindow, padding='5 5 10 10')  # create a frame inside the main window
     memoryframe.grid(row=0, sticky=(N, W, E, S))  # make the frame fill the window
 
@@ -109,19 +105,22 @@ def memory():
     # displays the score
     ttk.Label(memoryframe, textvariable=dscore, font='TkTextFont').grid(row=3, sticky='w')
 
-    # hides the string and enables the answer field
-    ttk.Button(memoryframe, text='Start', command=memorystart).grid(column=2, row=1)
+    # hides the string and enables the answer field and check button
+    global startbutton
+    startbutton = ttk.Button(memoryframe, text='Start', command=lambda: memorystart(''))
+    startbutton.grid(column=2, row=1)  # positions the start button
 
     # allows the player to enter the string
     ansentry = ttk.Entry(memoryframe, textvariable=answer, font='TkTextFont', exportselection=0, state='disabled')
     ansentry.grid(row=2, columnspan=2, sticky='w')  # positions the entry field
 
-    # checks if the string is correct when pressed
-    ansentrybutton = ttk.Button(memoryframe, text='Enter', command=lambda: check('memory', answer.get()))
-    ansentrybutton.grid(column=2, row=2)
+    # checks if the string is correct when pressed (disabled in the beginning)
+    global checkbutton
+    checkbutton = ttk.Button(memoryframe, text='Enter', command=lambda: check('memory'), state='disabled')
+    checkbutton.grid(column=2, row=2)
 
     memorywindow.bind('<space>', memorystart)
-    ansentry.bind('<Return>', lambda c: check('memory', answer.get()))  # calls the check function when Enter is pressed
+    ansentry.bind('<Return>', lambda c: check('memory'))  # calls the check function when Enter is pressed
 
     spacing('memory')  # creates space between all widgets
 
@@ -136,14 +135,28 @@ def memorystart(self):
     dstring.set('')  # sets the displayed string to nothing to hide it
     ansentry['state'] = 'enabled'  # enables the answer field (disabled at the beginning)
     ansentry.focus_set()  # sets focus to the answer field
+    startbutton['state'] = 'disabled'  # disables the start button
+    checkbutton['state'] = 'enabled'  # enables the check button
 
 
 # checks whether or not the player's answer is correct
-def check(game, ans):
-    if ans.replace(' ', '') == string:  # all spaces are removed from the answer before comparing
+def check(game):
+    if answer.get().replace(' ', '') == string:  # all spaces are removed from the answer before comparing
         exec(game + 'next()')  # advances to the next level of the specified game if the answer is correct
-    else:
-        end()  # calls the end function if the answer is incorrect
+    else:  # the game ends if the answer is incorrect
+        # chooses the correct form of the word "level"
+        if score == 1:
+            levelstr = ' level.'
+        else:
+            levelstr = ' levels.'
+
+        toptext.set('Game over! You passed ' + str(score) + levelstr)  # changes the text
+
+        makedirs('scores/' + game, exist_ok=True)  # creates the folder for the scores unless it exists
+        try:
+            open('scores/' + game + '/' + user.get() + '.score', 'x')  # creates the user's score file unless it exists
+        except FileExistsError:
+            pass
 
 
 # readies the next round in the memory game
@@ -156,23 +169,14 @@ def memorynext():
     ansentry['state'] = 'disabled'  # disables the answer field
     score += 1  # adds 1 to the score
     dscore.set('Levels passed: ' + str(score))  # converts the score into a string with more clarity
+    memoryframe.focus_set()
+    startbutton['state'] = 'enabled'  # enables the start button
+    checkbutton['state'] = 'disabled'  # disables the check button
 
-
-# ends the current game
-def end():
-    # chooses the correct form of the word "level"
-    if score == 1:
-        levelstr = ' level.'
-    else:
-        levelstr = ' levels.'
-
-    endtext = 'Game over! You passed ' + str(score) + levelstr  # sets the text to change to
-    toptext.set(endtext)  # changes the text
-
-    # with open(name + '.score', 'x', )
 
 mainwindow = Tk()  # create the main window
 mainwindow.title('Games')  # set the window's title
-login()
+mainwindow.resizable(0, 0)  # disables resizing of the window
+login()  # calls the function to create the login screen
 
 mainwindow.mainloop()  # starts the main event loop
