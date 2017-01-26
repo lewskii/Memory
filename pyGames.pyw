@@ -1,7 +1,8 @@
 from tkinter import *       # GUI tools
 from tkinter import ttk     # GUI tools
 from random import randrange  # returns a random integer in a given range
-from os import makedirs  # creates a directory
+from os import makedirs  # for creating directories
+from datetime import *  # dates and times
 
 
 # creates the login screen
@@ -175,9 +176,13 @@ def check(game):
 
         makedirs('scores/' + game, exist_ok=True)  # creates the folder for the scores unless it exists
         try:
-            open('scores/' + game + '/' + user.get() + '.score', 'x')  # creates the user's score file unless it exists
+            open('scores/' + game + '/' + user.get() + '.score', 'x')  # creates the user's score file
         except FileExistsError:
-            pass
+            pass  # does nothing if the file exists
+
+        datetime.now()
+        with open('scores/' + game + '/' + user.get() + '.score', 'a') as scorefile:
+
 
 
 # readies the next round in the memory game
