@@ -194,18 +194,18 @@ def check(game):
 
         toptext.set('Game over! You passed ' + str(score) + levelstr)  # changes the text
 
-        makedirs('scores/' + game, exist_ok=True)  # creates the folder for the scores unless it exists
+        makedirs('scores/', exist_ok=True)  # creates the folder for the scores unless it exists
         try:
-            open('scores/' + game + '/' + user.get() + '.score', 'x')  # creates the user's score file
+            open('scores/' + user.get() + '.score', 'x')  # creates the user's score file
         except FileExistsError:
             pass  # does nothing if the file exists
 
         # writes the user's score to their file
-        with open('scores/' + game + '/' + user.get() + '.score', 'a') as scorefile:
+        with open('scores/' + user.get() + '.score', 'a') as scorefile:
             scoreline = datetime.now().ctime().replace(' ', '_') + ' ' + game.title() + ' ' + str(score) + '\n'
             scorefile.write(scoreline)
         print('Saved the score to', path.dirname(path.realpath(__file__)) +
-              '\\scores\\' + game + '\\' + user.get() + '.score')  # log message, printed in the console
+              '\\scores\\' + user.get() + '.score')  # log message, printed in the console
 
         exec(game + 'window.after(3500, lambda: ' + game + 'window.destroy())')  # closes the specified window
         print('Closing', game, 'window')  # log message, printed in the console
