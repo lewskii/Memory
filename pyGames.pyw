@@ -11,7 +11,7 @@ def login():
     except NameError:
         pass
 
-    global loginframe  # allows the variable to be used in all functions
+    global loginframe  # global allows the variable to be used in all functions
     loginframe = ttk.Frame(mainwindow, padding='5 5 10 5')  # create a frame inside the main window
     loginframe.grid(row=0, sticky=(N, W, E, S))  # make the frame fill the window
 

@@ -1,2 +1,2 @@
-# memory
-A memory game created as a school project
+# pyGames
+Some games made with Python as a school project
