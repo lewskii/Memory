@@ -202,7 +202,7 @@ def check(game):
 
         # writes the user's score to their file
         with open('scores/' + game + '/' + user.get() + '.score', 'a') as scorefile:
-            scoreline = datetime.now().ctime().replace(' ', '_') + ' ' + game.title() + str(score)
+            scoreline = datetime.now().ctime().replace(' ', '_') + ' ' + game.title() + ' ' + str(score) + '\n'
             scorefile.write(scoreline)
         print('Saved the score to', path.dirname(path.realpath(__file__)) +
               '\\scores\\' + game + '\\' + user.get() + '.score')  # log message, printed in the console
