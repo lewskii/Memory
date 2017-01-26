@@ -1,2 +1,2 @@
 # pyGames
-Some games made with Python as a school project
+Some games (one at the moment) made with Python as a school project
