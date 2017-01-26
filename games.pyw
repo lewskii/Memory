@@ -90,6 +90,7 @@ def memory():
     global answer
     global ansentry
     global memoryframe
+    global memorywindow
     memorywindow = Toplevel()  # creates the child window for the memory game
     memorywindow.title('Memory')  # sets the window's title
     memorywindow.focus_set()  # sets focus to the window
@@ -155,9 +156,15 @@ def memorystart():
 
 # checks whether or not the player's answer is correct
 def check(game):
+    exec(game + 'window.focus_set()')  # sets focus to the game window
+    checkbutton['state'] = 'disabled'  # disables the check button
+    ansentry['state'] = 'disabled'  # disables the answer field
     if answer.get().replace(' ', '') == string:  # all spaces are removed from the answer before comparing
         exec(game + 'next()')  # advances to the next level of the specified game if the answer is correct
     else:  # the game ends if the answer is incorrect
+        startbutton['state'] = 'disabled'
+        answer.set('')  # empties the answer field
+        memorywindow.unbind('<space>')
         # chooses the correct form of the word "level"
         if score == 1:
             levelstr = ' level.'
@@ -180,12 +187,9 @@ def memorynext():
     string += str(randrange(0, 10))  # adds another random number to the string
     dstring.set(string)  # assigns the new string to the displayed string
     answer.set('')  # empties the answer field
-    ansentry['state'] = 'disabled'  # disables the answer field
     score += 1  # adds 1 to the score
     dscore.set('Levels passed: ' + str(score))  # converts the score into a string with more clarity
-    memoryframe.focus_set()
     startbutton['state'] = 'enabled'  # enables the start button
-    checkbutton['state'] = 'disabled'  # disables the check button
 
 
 mainwindow = Tk()  # create the main window
