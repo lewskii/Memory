@@ -1,7 +1,7 @@
 from tkinter import *       # GUI tools
 from tkinter import ttk     # GUI tools
 from random import randrange  # returns a random integer in a given range
-from os import makedirs, path  # for creating directories
+from os import makedirs, path  # for creating directories and displaying file paths
 from datetime import datetime  # dates and times
 from time import sleep  # stops the program for a specified time
 
@@ -194,19 +194,39 @@ def check(game):
 
         toptext.set('Game over! You passed ' + str(score) + levelstr)  # changes the text
 
+        userfilename = user.get().replace(' ', '_^_')
+
         makedirs('scores/', exist_ok=True)  # creates the folder for the scores unless it exists
         try:
-            open('scores/' + user.get() + '.score', 'x')  # creates the user's score file
+            open('scores/' + userfilename + '.score', 'x')  # creates the user's score file
+            open('scores/' + game + '.score', 'x')  # creates the game's highscore file
         except FileExistsError:
-            pass  # does nothing if the file exists
+            pass  # does nothing if the files exist
 
         # writes the user's score to their file
-        with open('scores/' + user.get() + '.score', 'a') as scorefile:
+        with open('scores/' + userfilename + '.score', 'a') as scorefile:
             scoreline = datetime.now().ctime().replace(' ', '_') + ' ' + game.title() + ' ' + str(score) + '\n'
             scorefile.write(scoreline)
         print('Saved the score to', path.dirname(path.realpath(__file__)) +
-              '\\scores\\' + user.get() + '.score')  # log message, printed in the console
+              '\\scores\\' + userfilename + '.score')  # log message, printed in the console
 
+        # saving highscores into a file
+        highscores = {}  # creates a dictionary for the highscores
+        with open('scores/' + game + '.score') as highscorefile:  # opens the file to be used for the indented code
+            for line in highscorefile:  # does the indented code to every line in the file
+                split = line.split()  # splits the current line into a list, items separated by spaces
+                highscores[split[0]] = split[1]  # adds the first two list items into the highscore dictionary
+        try:
+            if int(highscores[userfilename]) < score:
+                highscores[userfilename] = score  # replaces the player's old highscore if the player passes it
+        except KeyError:
+            print('KeyError')
+            highscores[userfilename] = score  # sets the player's highscore if it doesn't exist
+        with open('scores/' + game + '.score', 'w') as highscorefile:
+            for i in highscores:
+                highscorefile.write(i + ' ' + str(highscores[i]) + '\n')  # writes the updated highscores to the file
+
+        print(highscores[userfilename])
         exec(game + 'window.after(3500, lambda: ' + game + 'window.destroy())')  # closes the specified window
         print('Closing', game, 'window')  # log message, printed in the console
 
