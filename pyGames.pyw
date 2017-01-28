@@ -25,7 +25,7 @@ def login():
     user.trace_variable('w', charlimit)
 
     # tells the user the characters that can't be used in the username
-    badcharlabel = ttk.Label(loginframe, text='Username cannot contain characters / \\ : * ? " < > |')
+    badcharlabel = ttk.Label(loginframe, text='Username cannot contain characters / \\ : * ? " < > | +')
     badcharlabel.grid(row=0, columnspan=3, sticky='w')  # positions the label
 
     # allows the user to enter a username
@@ -59,7 +59,7 @@ def charlimit(*args):
 
 # checks the username for forbidden characters
 def checkname(name):
-    badchars = ['/', '\\', '*', '?', ':', '"', '<', '>', '|']  # these characters can't be used in filenames
+    badchars = ['/', '\\', '*', '?', ':', '"', '<', '>', '|', '+']  # these characters can't be used in the username
     if set(name).isdisjoint(badchars) and name.replace(' ', '') != '':
         print('Username is valid')  # log message, printed in the console
         menu()  # creates the menu if the username doesn't contain any bad characters
@@ -194,18 +194,21 @@ def check(game):
 
         toptext.set('Game over! You passed ' + str(score) + levelstr)  # changes the text
 
-        userfilename = user.get().replace(' ', '_^_')
+        userfilename = user.get().replace(' ', '+')
 
         makedirs('scores/', exist_ok=True)  # creates the folder for the scores unless it exists
         try:
             open('scores/' + userfilename + '.score', 'x')  # creates the user's score file
+        except FileExistsError:
+            pass  # does nothing if the files exist
+        try:
             open('scores/' + game + '.score', 'x')  # creates the game's highscore file
         except FileExistsError:
             pass  # does nothing if the files exist
 
         # writes the user's score to their file
         with open('scores/' + userfilename + '.score', 'a') as scorefile:
-            scoreline = datetime.now().ctime().replace(' ', '_') + ' ' + game.title() + ' ' + str(score) + '\n'
+            scoreline = datetime.now().ctime().replace(' ', '+') + ' ' + game.title() + ' ' + str(score) + '\n'
             scorefile.write(scoreline)
         print('Saved the score to', path.dirname(path.realpath(__file__)) +
               '\\scores\\' + userfilename + '.score')  # log message, printed in the console
@@ -219,14 +222,13 @@ def check(game):
         try:
             if int(highscores[userfilename]) < score:
                 highscores[userfilename] = score  # replaces the player's old highscore if the player passes it
+                print('New highscore in', game, 'for', user.get() + ':', score)
         except KeyError:
-            print('KeyError')
             highscores[userfilename] = score  # sets the player's highscore if it doesn't exist
         with open('scores/' + game + '.score', 'w') as highscorefile:
             for i in highscores:
                 highscorefile.write(i + ' ' + str(highscores[i]) + '\n')  # writes the updated highscores to the file
 
-        print(highscores[userfilename])
         exec(game + 'window.after(3500, lambda: ' + game + 'window.destroy())')  # closes the specified window
         print('Closing', game, 'window')  # log message, printed in the console
 
@@ -244,7 +246,7 @@ def memorynext():
 
 
 mainwindow = Tk()  # create the main window
-mainwindow.title('Games')  # set the window's title
+mainwindow.title('pyGames')  # set the window's title
 mainwindow.resizable(0, 0)  # disables resizing of the window
 login()  # calls the function to create the login screen
 
