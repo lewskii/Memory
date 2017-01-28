@@ -1,4 +1,4 @@
-# pyGames
-Some games (one at the moment) made with Python 3.6.0 as a school project
+# Memory
+A memory game made with Python 3.6.0 as a school project.
 
-Requires Python 3.x and tkinter
+Requires Python 3.x and tkinter.

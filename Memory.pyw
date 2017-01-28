@@ -246,7 +246,7 @@ def memorynext():
 
 
 mainwindow = Tk()  # create the main window
-mainwindow.title('pyGames')  # set the window's title
+mainwindow.title('Memory')  # set the window's title
 mainwindow.resizable(0, 0)  # disables resizing of the window
 login()  # calls the function to create the login screen
 
