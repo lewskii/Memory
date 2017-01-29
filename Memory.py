@@ -3,7 +3,6 @@ from tkinter import ttk     # GUI tools
 from random import randrange  # returns a random integer in a given range
 from os import makedirs, path  # for creating directories and displaying file paths
 from datetime import datetime  # dates and times
-from time import sleep  # stops the program for a specified time
 
 print('Launched program')  # log message, printed in the console
 
@@ -18,15 +17,15 @@ def login():
 
     global loginframe  # global allows the variable to be used in all functions
     loginframe = ttk.Frame(mainwindow, padding='5 5 10 5')  # create a frame inside the main window
-    loginframe.grid(row=0, sticky=(N, W, E, S))  # make the frame fill the window
+    loginframe.grid(sticky='nwes')  # make the frame fill the window
 
     global user
     user = StringVar()  # the username, StringVar() allows the variable to change globally
-    user.trace_variable('w', charlimit)
+    user.trace_variable('w', lambda cl, a, b: charlimit(user.get()))
 
     # tells the user the characters that can't be used in the username
     badcharlabel = ttk.Label(loginframe, text='Username cannot contain characters / \\ : * ? " < > | +')
-    badcharlabel.grid(row=0, columnspan=3, sticky='w')  # positions the label
+    badcharlabel.grid(columnspan=3, sticky='w')  # positions the label
 
     # allows the user to enter a username
     ttk.Label(loginframe, text='Enter a username:').grid(row=1, sticky='e')  # labels the username entry field
@@ -49,9 +48,13 @@ def login():
     userentry.bind('<Return>', lambda cn: checkname(user.get()))  # binds Enter to the menu function
 
 
+# creates space between all widgets in the frame with the given name
+def spacing(frame):
+    exec('for child in ' + frame + 'frame.winfo_children(): child.grid_configure(padx=5, pady=5)')
+
+
 # limits the number of characters that can be entered into the username field
-def charlimit(*args):
-    s = user.get()
+def charlimit(s):
     if len(s) > 16:
         user.set(s[:16])
         print('Limited username length (16)')  # log message, printed in the console
@@ -74,13 +77,10 @@ def menu():
 
     global menuframe  # lets the variable be used in all functions
     menuframe = ttk.Frame(mainwindow, padding='5 5 10 10')  # creates a new frame inside the main window
-    menuframe.grid(row=0, sticky=(N, W, E, S))  # make the frame fill the window
-    ttk.Label(menuframe, text='User').grid(row=0)  # labels the user options
+    menuframe.grid(sticky='nwes')  # make the frame fill the window
     ttk.Label(menuframe, textvariable=user).grid(row=1)  # displays the current username
-    ttk.Label(menuframe, text='Games').grid(row=0, column=1, columnspan=2)  # labels the game options
 
-    # not yet functional
-    scorebutton = ttk.Button(menuframe, text='Scores', state='disabled')  # displays scores
+    scorebutton = ttk.Button(menuframe, text='Scores', command=userscores)  # displays scores
     scorebutton.grid(row=2)  # positions the button
     logoutbutton = ttk.Button(menuframe, text='Log out', command=login)  # allows changing username
     logoutbutton.grid(row=3)  # positions the button
@@ -111,7 +111,7 @@ def memory():
     memorywindow.focus_set()  # sets focus to the window
     memorywindow.resizable(0, 0)  # disables resizing of the window
     memoryframe = ttk.Frame(memorywindow, padding='5 5 10 10')  # create a frame inside the main window
-    memoryframe.grid(row=0, sticky=(N, W, E, S))  # make the frame fill the window
+    memoryframe.grid(sticky='nwes')  # make the frame fill the window
 
     toptext = StringVar()  # the text displayed at the top of the page
 
@@ -128,7 +128,7 @@ def memory():
     dscore.set('Levels passed: ' + str(score))  # converts the score into a string with more clarity
 
     # displays the game's instructions
-    ttk.Label(memoryframe, textvariable=toptext, font='TkHeadingFont').grid(row=0, columnspan=3, sticky='w')
+    ttk.Label(memoryframe, textvariable=toptext, font='TkHeadingFont').grid(columnspan=3, sticky='w')
 
     # displays the string
     ttk.Label(memoryframe, textvariable=dstring, font='TkTextFont').grid(row=1, columnspan=2, sticky='w')
@@ -137,7 +137,7 @@ def memory():
 
     # hides the string and enables the answer field and check button
     global startbutton
-    startbutton = ttk.Button(memoryframe, text='Start', command=memorystart)
+    startbutton = ttk.Button(memoryframe, text='Start', command=start)
     startbutton.grid(column=2, row=1)  # positions the start button
 
     # allows the player to enter the string
@@ -146,24 +146,19 @@ def memory():
 
     # checks if the string is correct when pressed (disabled in the beginning)
     global checkbutton
-    checkbutton = ttk.Button(memoryframe, text='Enter', command=lambda: check('memory'), state='disabled')
+    checkbutton = ttk.Button(memoryframe, text='Enter', command=check, state='disabled')
     checkbutton.grid(column=2, row=2)
 
-    memorywindow.bind('<space>', lambda s: memorystart())
+    memorywindow.bind('<space>', lambda s: start())
     ansentry.unbind('<space>')
-    ansentry.bind('<Return>', lambda c: check('memory'))  # calls the check function when Enter is pressed
+    ansentry.bind('<Return>', lambda c: check())  # calls the check function when Enter is pressed
 
     spacing('memory')  # creates space between all widgets
     print('Created memory game interface')  # log message, printed in the console
 
 
-# creates space between all widgets in the frame with the given name
-def spacing(frame):
-    exec('for child in ' + frame + 'frame.winfo_children(): child.grid_configure(padx=5, pady=5)')
-
-
 # starts a memory game round
-def memorystart():
+def start():
     if dstring.get() != '':
         print('Started memory game round', score + 1)  # log message, printed in the console
         dstring.set('')  # sets the displayed string to nothing to hide it
@@ -174,18 +169,20 @@ def memorystart():
 
 
 # checks whether or not the player's answer is correct
-def check(game):
-    exec(game + 'window.focus_set()')  # sets focus to the game window
+def check():
+    memorywindow.focus_set()  # sets focus to the game window
     checkbutton['state'] = 'disabled'  # disables the check button
     ansentry['state'] = 'disabled'  # disables the answer field
     if answer.get().replace(' ', '') == string:  # all spaces are removed from the answer before comparing
         print('Answer is correct')  # log message, printed in the console
-        exec(game + 'next()')  # advances to the next level of the specified game if the answer is correct
+        nextlevel()  # advances to the next level of the game if the answer is correct
     else:  # the game ends if the answer is incorrect
-        print('Answer is incorrect')  # log message, printed in the console
+        print('Answer is incorrect, game ends')  # log message, printed in the console
+        print('Score for', user.get() + ':', score)
         startbutton['state'] = 'disabled'  # disables the start button
         answer.set('')  # empties the answer field
         memorywindow.unbind('<space>')  # unbinds the spacebar from the start function
+
         # chooses the correct form of the word "level"
         if score == 1:
             levelstr = ' level.'
@@ -194,47 +191,47 @@ def check(game):
 
         toptext.set('Game over! You passed ' + str(score) + levelstr)  # changes the text
 
-        userfilename = user.get().replace(' ', '+')
+        userfilename = user.get().replace(' ', '+')  # spaces in username replaced with pluses for formatting reasons
 
         makedirs('scores/', exist_ok=True)  # creates the folder for the scores unless it exists
         try:
             open('scores/' + userfilename + '.score', 'x')  # creates the user's score file
         except FileExistsError:
-            pass  # does nothing if the files exist
+            pass  # does nothing if the file exists
         try:
-            open('scores/' + game + '.score', 'x')  # creates the game's highscore file
+            open('scores/highscores.score', 'x')  # creates the game's highscore file
         except FileExistsError:
-            pass  # does nothing if the files exist
+            pass  # does nothing if the file exists
 
-        # writes the user's score to their file
-        with open('scores/' + userfilename + '.score', 'a') as scorefile:
-            scoreline = datetime.now().ctime().replace(' ', '+') + ' ' + game.title() + ' ' + str(score) + '\n'
-            scorefile.write(scoreline)
+        # saving the user's score
+        with open('scores/' + userfilename + '.score', 'a') as scorefile:  # opens the file for appending
+            scoreline = datetime.now().ctime().replace(' ', '+') + ' ' + str(score) + '\n'  # sets the string to write
+            scorefile.write(scoreline)  # writes the string to the user's score file
         print('Saved the score to', path.dirname(path.realpath(__file__)) +
               '\\scores\\' + userfilename + '.score')  # log message, printed in the console
 
-        # saving highscores into a file
+        # saving highscores
         highscores = {}  # creates a dictionary for the highscores
-        with open('scores/' + game + '.score') as highscorefile:  # opens the file to be used for the indented code
-            for line in highscorefile:  # does the indented code to every line in the file
-                split = line.split()  # splits the current line into a list, items separated by spaces
+        with open('scores/highscores.score') as highscorefile:  # opens the highscore file for reading
+            for line in highscorefile:
+                split = line.split()  # makes a list out of every line, list items separated by spaces
                 highscores[split[0]] = split[1]  # adds the first two list items into the highscore dictionary
         try:
-            if int(highscores[userfilename]) < score:
-                highscores[userfilename] = score  # replaces the player's old highscore if the player passes it
-                print('New highscore in', game, 'for', user.get() + ':', score)
+            if int(highscores[userfilename]) < score:  # if the player's score exceeds their highscore...
+                highscores[userfilename] = score  # ...the old highscore is replaced
+                print('New highscore for', user.get() + ':', score)  # log message in the console
         except KeyError:
             highscores[userfilename] = score  # sets the player's highscore if it doesn't exist
-        with open('scores/' + game + '.score', 'w') as highscorefile:
+        with open('scores/highscores.score', 'w') as highscorefile:  # opens the highscore file for writing
             for i in highscores:
                 highscorefile.write(i + ' ' + str(highscores[i]) + '\n')  # writes the updated highscores to the file
 
-        exec(game + 'window.after(3500, lambda: ' + game + 'window.destroy())')  # closes the specified window
-        print('Closing', game, 'window')  # log message, printed in the console
+        memorywindow.after(3500, memorywindow.destroy)  # closes the game window
+        print('Closing game window')  # log message, printed in the console
 
 
 # readies the next round in the memory game
-def memorynext():
+def nextlevel():
     global string  # lets the outside variable be changed from inside the function
     global score
     string += str(randrange(0, 10))  # adds another random number to the string
@@ -243,6 +240,44 @@ def memorynext():
     score += 1  # adds 1 to the score
     dscore.set('Levels passed: ' + str(score))  # converts the score into a string with more clarity
     startbutton['state'] = 'enabled'  # enables the start button
+
+
+def userscores():
+    try:
+        userfilename = user.get().replace(' ', '+')  # spaces in username replaced with pluses for formatting reasons
+        userscoredict = {}  # creates a dictionary for the scores
+
+        with open('scores/' + userfilename + '.score') as scorefile:  # opens the user's score file for reading
+            for line in scorefile:
+                split = line.split()  # makes a list out of every line, list items separated by spaces
+                userscoredict[split[0]] = split[1]  # adds the first two list items into the score dictionary
+
+        global scoreframe
+        scorewindow = Toplevel()  # creates a window to display scores in
+        scorewindow.title('User scores')  # names the window
+        scorewindow.focus_set()
+        scorewindow.resizable(0, 0)  # disables resizing
+        scoreframe = ttk.Frame(scorewindow, padding='5 5 10 10')  # creates a frame for the widgets
+        scoreframe.grid(sticky='nwes')
+
+        ttk.Label(scoreframe, textvariable=user).grid(row=0)  # shows the username at the top
+        ttk.Label(scoreframe, text='Score').grid(row=1, sticky='w')  # labels the score column
+        ttk.Label(scoreframe, text='Time achieved').grid(row=1, column=1, sticky='w')  # labels the time column
+
+        scores = ''  # variable for just the score numbers
+        times = ''  # variable for just the score times
+        for i in userscoredict:
+            scores += str(userscoredict[i]) + '\n'
+            times += i.replace('+', ' ') + '\n'
+        print(scores)
+        print(times)
+
+        ttk.Label(scoreframe, text=scores).grid(row=2, sticky='w')  # displays all of the user's scores
+        ttk.Label(scoreframe, text=times).grid(row=2, column=1, sticky='w')  # displays the times of the scores
+
+        spacing('score')
+    except FileNotFoundError:
+        pass  # does nothing if the score file doesn't exist
 
 
 mainwindow = Tk()  # create the main window
