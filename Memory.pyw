@@ -3,6 +3,7 @@ from tkinter import ttk     # GUI tools
 from random import randrange  # returns a random integer in a given range
 from os import makedirs, path  # for creating directories and displaying file paths
 from datetime import datetime  # dates and times
+from operator import itemgetter
 
 print('Launched program')  # log message, printed in the console
 
@@ -80,15 +81,14 @@ def menu():
     menuframe.grid(sticky='nwes')  # make the frame fill the window
     ttk.Label(menuframe, textvariable=user).grid(row=1)  # displays the current username
 
-    scorebutton = ttk.Button(menuframe, text='Scores', command=userscores)  # displays scores
-    scorebutton.grid(row=2)  # positions the button
     logoutbutton = ttk.Button(menuframe, text='Log out', command=login)  # allows changing username
-    logoutbutton.grid(row=3)  # positions the button
+    logoutbutton.grid(row=2)  # positions the button
+    scorebutton = ttk.Button(menuframe, text='Scores', command=lambda: scoredisplay('user'))  # displays scores
+    scorebutton.grid(row=3)  # positions the button
 
     ttk.Label(menuframe, text='Memory').grid(row=1, column=1)  # label the memory options
     ttk.Button(menuframe, text='Play', command=memory).grid(row=2, column=1)  # launches the memory game
-    # not yet functional
-    ttk.Button(menuframe, text='Highscores', state='disabled').grid(row=3, column=1)  # shows the game's highscores
+    ttk.Button(menuframe, text='Highscores', command=lambda: scoredisplay('highs')).grid(row=3, column=1)  # highscores
 
     spacing('menu')  # creates space between all widgets
     print('Created menu interface')  # log message, printed in the console
@@ -175,7 +175,14 @@ def check():
     ansentry['state'] = 'disabled'  # disables the answer field
     if answer.get().replace(' ', '') == string:  # all spaces are removed from the answer before comparing
         print('Answer is correct')  # log message, printed in the console
-        nextlevel()  # advances to the next level of the game if the answer is correct
+        global string  # lets the outside variable be changed from inside the function
+        global score
+        string += str(randrange(0, 10))  # adds another random number to the string
+        dstring.set(string)  # assigns the new string to the displayed string
+        answer.set('')  # empties the answer field
+        score += 1  # adds 1 to the score
+        dscore.set('Levels passed: ' + str(score))  # converts the score into a string with more clarity
+        startbutton['state'] = 'enabled'  # enables the start button
     else:  # the game ends if the answer is incorrect
         print('Answer is incorrect, game ends')  # log message, printed in the console
         print('Score for', user.get() + ':', score)
@@ -230,50 +237,68 @@ def check():
         print('Closing game window')  # log message, printed in the console
 
 
-# readies the next round in the memory game
-def nextlevel():
-    global string  # lets the outside variable be changed from inside the function
-    global score
-    string += str(randrange(0, 10))  # adds another random number to the string
-    dstring.set(string)  # assigns the new string to the displayed string
-    answer.set('')  # empties the answer field
-    score += 1  # adds 1 to the score
-    dscore.set('Levels passed: ' + str(score))  # converts the score into a string with more clarity
-    startbutton['state'] = 'enabled'  # enables the start button
-
-
-def userscores():
+def scoredisplay(name):
     try:
         userfilename = user.get().replace(' ', '+')  # spaces in username replaced with pluses for formatting reasons
-        userscoredict = {}  # creates a dictionary for the scores
+        scoredict = {}  # creates a dictionary for the scores
 
-        with open('scores/' + userfilename + '.score') as scorefile:  # opens the user's score file for reading
+        """
+        sets the correct values to variables based on the parameter
+        filename = the file to read score values from
+        title = the title for the window
+        label2 = the label for the second column; the user who got the highscore or the time a score was achieved
+        """
+        if name == 'user':
+            filename = userfilename
+            title = user.get() + '\'s scores'
+            label2 = 'Time achieved'
+        else:
+            filename = 'highscores'
+            title = 'Highscores'
+            label2 = 'User'
+
+        with open('scores/' + filename + '.score') as scorefile:  # opens the score file for reading
             for line in scorefile:
                 split = line.split()  # makes a list out of every line, list items separated by spaces
-                userscoredict[split[0]] = split[1]  # adds the first two list items into the score dictionary
+                scoredict[split[0]] = split[1]  # adds the first two list items into the score dictionary
+
+        # makes a list of tuples, each containing a name or time and a score
+        scores = sorted(scoredict.items(), key=itemgetter(1), reverse=True)
+        scores = map(list, zip(*scores))  # separates the values into their separate lists
+
+        # this part is explained in the documentation
+        count = 0
+        for i in scores:
+            if count == 0:
+                stat2 = i
+            elif count == 1:
+                scorelist = i
+            count += 1
+        count = 0
+        for i in stat2:
+            stat2[count] = i.replace('+', ' ')
+            count += 1
+        scorelistd = ''
+        for i in scorelist:
+            scorelistd += i + '\n'
+        stat2d = ''
+        for i in stat2:
+            stat2d += i + '\n'
 
         global scoreframe
         scorewindow = Toplevel()  # creates a window to display scores in
-        scorewindow.title('User scores')  # names the window
-        scorewindow.focus_set()
+        scorewindow.title(title)  # names the window
+        scorewindow.focus_set()  # sets focus to the score window
         scorewindow.resizable(0, 0)  # disables resizing
         scoreframe = ttk.Frame(scorewindow, padding='5 5 10 10')  # creates a frame for the widgets
-        scoreframe.grid(sticky='nwes')
+        scoreframe.grid(sticky='nwes')  # makes the frame fill the window
 
-        ttk.Label(scoreframe, textvariable=user).grid(row=0)  # shows the username at the top
+        ttk.Label(scoreframe, text=title).grid(row=0)  # shows the username at the top
         ttk.Label(scoreframe, text='Score').grid(row=1, sticky='w')  # labels the score column
-        ttk.Label(scoreframe, text='Time achieved').grid(row=1, column=1, sticky='w')  # labels the time column
+        ttk.Label(scoreframe, text=label2).grid(row=1, column=1, sticky='w')  # labels the time column
 
-        scores = ''  # variable for just the score numbers
-        times = ''  # variable for just the score times
-        for i in userscoredict:
-            scores += str(userscoredict[i]) + '\n'
-            times += i.replace('+', ' ') + '\n'
-        print(scores)
-        print(times)
-
-        ttk.Label(scoreframe, text=scores).grid(row=2, sticky='w')  # displays all of the user's scores
-        ttk.Label(scoreframe, text=times).grid(row=2, column=1, sticky='w')  # displays the times of the scores
+        ttk.Label(scoreframe, text=scorelistd).grid(row=2, sticky='w')  # displays all of the user's scores
+        ttk.Label(scoreframe, text=stat2d).grid(row=2, column=1, sticky='w')  # displays the times of the scores
 
         spacing('score')
     except FileNotFoundError:
