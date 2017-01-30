@@ -88,7 +88,7 @@ def menu():
 
     ttk.Label(menuframe, text='Memory').grid(row=1, column=1)  # label the memory options
     ttk.Button(menuframe, text='Play', command=memory).grid(row=2, column=1)  # launches the memory game
-    ttk.Button(menuframe, text='Highscores', command=lambda: scoredisplay('highs')).grid(row=3, column=1)  # highscores
+    ttk.Button(menuframe, text='Highscores', command=lambda: scoredisplay('high')).grid(row=3, column=1)  # highscores
 
     spacing('menu')  # creates space between all widgets
     print('Created menu interface')  # log message, printed in the console
@@ -173,10 +173,10 @@ def check():
     memorywindow.focus_set()  # sets focus to the game window
     checkbutton['state'] = 'disabled'  # disables the check button
     ansentry['state'] = 'disabled'  # disables the answer field
+    global string  # lets the outside variable be changed from inside the function
+    global score
     if answer.get().replace(' ', '') == string:  # all spaces are removed from the answer before comparing
         print('Answer is correct')  # log message, printed in the console
-        global string  # lets the outside variable be changed from inside the function
-        global score
         string += str(randrange(0, 10))  # adds another random number to the string
         dstring.set(string)  # assigns the new string to the displayed string
         answer.set('')  # empties the answer field
@@ -262,8 +262,8 @@ def scoredisplay(name):
                 split = line.split()  # makes a list out of every line, list items separated by spaces
                 scoredict[split[0]] = split[1]  # adds the first two list items into the score dictionary
 
-        # makes a list of tuples, each containing a name or time and a score
-        scores = sorted(scoredict.items(), key=itemgetter(1), reverse=True)
+        # makes a list of tuples, each containing a name or time and a score; the tuples are (supposed to be) sorted
+        scores = sorted(scoredict.items(), key=itemgetter(1))
         scores = map(list, zip(*scores))  # separates the values into their separate lists
 
         # this part is explained in the documentation
@@ -293,7 +293,7 @@ def scoredisplay(name):
         scoreframe = ttk.Frame(scorewindow, padding='5 5 10 10')  # creates a frame for the widgets
         scoreframe.grid(sticky='nwes')  # makes the frame fill the window
 
-        ttk.Label(scoreframe, text=title).grid(row=0)  # shows the username at the top
+        ttk.Label(scoreframe, text=title).grid(row=0, columnspan=2)  # shows the username at the top
         ttk.Label(scoreframe, text='Score').grid(row=1, sticky='w')  # labels the score column
         ttk.Label(scoreframe, text=label2).grid(row=1, column=1, sticky='w')  # labels the time column
 

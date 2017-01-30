@@ -11,6 +11,7 @@
             max-width: 600px;
             padding-left: 10px;
             padding-right: 10px;
+            padding-bottom: 100px;
             margin: 0 auto;
             background-color: rgb(175, 225, 255);
             font-family: helvetica;
@@ -20,6 +21,9 @@
         }
         p {
             text-align: justify;
+        }
+        li {
+            margin-top: 10px;
         }
     </style>
 </head>
@@ -78,7 +82,25 @@
 <h3>Main Menu</h3>
 <p>
     When the <b>menu()</b> function is called, the login frame is destroyed and the "Removed login interface" log message is printed.
-    Then, a frame is created to hold the widgets for the main menu.
+    Then, a frame is created to hold the widgets for the main menu. Two labels and four buttons are created.
+    The first label labels the "Log out" and "Scores" buttons with the username, indicating that they're related to the user.
+    The second label labels the "Play" and "Highscores" buttons with the text "Memory", indicating that they're related to the game.
+    The "Log out" button calls the <b>login()</b> function, letting the user choose another username.
+    The "Scores" and "Highscores" buttons call the <b>scoredisplay()</b> function to display either the user's scores or all users' highscores.
+    The "Play" button calls the <b>memory()</b> function, opening the game in a new window.
+</p>
+<h3>Score Display</h3>
+<p>
+    Depending on the function's "name" parameter, some variables are assigned different values. The "Scores" button,
+    under the username, calls the function with "user" as the "name" parameter. In this case:
+</p>
+<ul>
+    <li>The file to get the displayed scores from is set to the username, with spaces replaced with plus signs.</li>
+    <li>The window's title is set to "[user]'s scores", e.g. "lewski's scores".</li>
+    <li>The label for the second column is set to "Time achieved", meaning the date and time the score was achieved.</li>
+</ul>
+<p>
+
 </p>
 </body>
 </html>
