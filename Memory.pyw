@@ -4,15 +4,15 @@ from random import randrange  # returns a random integer in a given range
 from os import makedirs, path  # for creating directories and displaying file paths
 from datetime import datetime  # dates and times
 import pip  # for installing additional modules
-
-print('Launched program')  # log message, printed in the console
-
+from collections import OrderedDict  # an ordered dictionary
 try:
     from sortedcontainers import SortedDict
 except ModuleNotFoundError:
     pip.main(['install', 'sortedcontainers'])
-    print('Installed SortedContainers using pip')
     from sortedcontainers import SortedDict
+
+print('Launched program')  # log message, printed in the console
+
 
 
 # creates the login screen
@@ -256,7 +256,7 @@ def scoredisplay(name):
         """
         if name == 'user':
             filename = userfilename
-            scoredict = SortedDict(lambda key: 0,)
+            scoredict = OrderedDict()
             title = user.get() + '\'s scores'
             label2 = 'Time achieved'
         else:
@@ -269,12 +269,15 @@ def scoredisplay(name):
             for line in scorefile:  # does the following operations to all lines in the file
                 split = line.split()  # makes a list out of the line, list items separated by spaces in the file
                 scoredict[split[0]] = split[1]
+        if name != 'user':
+            scoredict = OrderedDict(sorted(scoredict.items(), key=lambda i: int(i[1]), reverse=True))
+        print(scoredict)
 
         scorelistd = ''
         stat2d = ''
         for item in scoredict:
-            scorelistd += item[1]
-            stat2d += item[0]
+            scorelistd += str(scoredict[item]) + '\n'
+            stat2d += item.replace('+', ' ') + '\n'
 
         global scoreframe
         scorewindow = Toplevel()  # creates a window to display scores in
