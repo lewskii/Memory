@@ -3,9 +3,16 @@ from tkinter import ttk     # GUI tools
 from random import randrange  # returns a random integer in a given range
 from os import makedirs, path  # for creating directories and displaying file paths
 from datetime import datetime  # dates and times
-from operator import itemgetter
+import pip  # for installing additional modules
 
 print('Launched program')  # log message, printed in the console
+
+from sortedcontainers import SortedDict
+
+"""
+pip.main(['install', 'sortedcontainers'])
+print('Installed SortedContainers using pip')
+"""
 
 
 # creates the login screen
@@ -240,7 +247,6 @@ def check():
 def scoredisplay(name):
     try:
         userfilename = user.get().replace(' ', '+')  # spaces in username replaced with pluses for formatting reasons
-        scoredict = {}  # creates a dictionary for the scores
 
         """
         sets the correct values to variables based on the parameter
@@ -250,40 +256,25 @@ def scoredisplay(name):
         """
         if name == 'user':
             filename = userfilename
+            scoredict = SortedDict(lambda key: 0,)
             title = user.get() + '\'s scores'
             label2 = 'Time achieved'
         else:
+            scoredict = SortedDict()
             filename = 'highscores'
             title = 'Highscores'
             label2 = 'User'
 
         with open('scores/' + filename + '.score') as scorefile:  # opens the score file for reading
-            for line in scorefile:
-                split = line.split()  # makes a list out of every line, list items separated by spaces
-                scoredict[split[0]] = split[1]  # adds the first two list items into the score dictionary
+            for line in scorefile:  # does the following operations to all lines in the file
+                split = line.split()  # makes a list out of the line, list items separated by spaces in the file
+                scoredict[split[0]] = split[1]
 
-        # makes a list of tuples, each containing a name or time and a score; the tuples are (supposed to be) sorted
-        scores = sorted(scoredict.items(), key=itemgetter(1))
-        scores = map(list, zip(*scores))  # separates the values into their separate lists
-
-        # this part is explained in the documentation
-        count = 0
-        for i in scores:
-            if count == 0:
-                stat2 = i
-            elif count == 1:
-                scorelist = i
-            count += 1
-        count = 0
-        for i in stat2:
-            stat2[count] = i.replace('+', ' ')
-            count += 1
         scorelistd = ''
-        for i in scorelist:
-            scorelistd += i + '\n'
         stat2d = ''
-        for i in stat2:
-            stat2d += i + '\n'
+        for item in scoredict:
+            scorelistd += item[1]
+            stat2d += item[0]
 
         global scoreframe
         scorewindow = Toplevel()  # creates a window to display scores in
