@@ -38,7 +38,6 @@
     It's recommended to run Memory.pyw when playing the game.
     The program prints an event log into the Python console. Run Memory.py instead of Memory.pyw to enable the console.
 </p>
-
 <hr />
 
 <h2>
@@ -92,15 +91,26 @@
 <h3>Score Display</h3>
 <p>
     Depending on the function's "name" parameter, some variables are assigned different values. The "Scores" button,
-    under the username, calls the function with "user" as the "name" parameter. In this case:
+    under the username, calls the <b>scoredisplay()</b> function with "user" as the "name" parameter. In this case:
 </p>
 <ul>
     <li>The file to get the displayed scores from is set to the username with spaces replaced with plus signs.</li>
-    <li>The window's title is set to "[user]'s scores", e.g. "lewski's scores".</li>
+    <li>The window's title is set to "Levels passed by [user]", e.g. "Levels passed by Lewski".</li>
     <li>The label for the second column is set to "Time achieved", meaning the date and time the score was achieved.</li>
 </ul>
 <p>
-
+    If the "name" parameter is something other than "user", the variables will be assigned different values.
+    The "Highscores" button calls the <b>scoredisplay()</b> function with "high" as the parameter, so in this case:
+</p>
+<ul>
+    <li>The file to get the displayed scores from is set to "highscores".</li>
+    <li>The window's title is set to "Highscores".</li>
+    <li>The label for the second column is set to "User".</li>
+</ul>
+<p>
+    After the parameter-dependent variables have been determined, the dictionary the scores will be temporarily stored in
+    is set to an empty OrderedDict(). Unlike a normal dict, the OrderedDict has a determined order.
+    The file "scores/filename.scores" is opened.
 </p>
 </body>
 </html>

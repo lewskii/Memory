@@ -3,16 +3,9 @@ from tkinter import ttk     # GUI tools
 from random import randrange  # returns a random integer in a given range
 from os import makedirs, path  # for creating directories and displaying file paths
 from datetime import datetime  # dates and times
-import pip  # for installing additional modules
 from collections import OrderedDict  # an ordered dictionary
-try:
-    from sortedcontainers import SortedDict
-except ModuleNotFoundError:
-    pip.main(['install', 'sortedcontainers'])
-    from sortedcontainers import SortedDict
 
 print('Launched program')  # log message, printed in the console
-
 
 
 # creates the login screen
@@ -246,7 +239,6 @@ def check():
 
 def scoredisplay(name):
     try:
-        userfilename = user.get().replace(' ', '+')  # spaces in username replaced with pluses for formatting reasons
 
         """
         sets the correct values to variables based on the parameter
@@ -255,23 +247,21 @@ def scoredisplay(name):
         label2 = the label for the second column; the user who got the highscore or the time a score was achieved
         """
         if name == 'user':
-            filename = userfilename
-            scoredict = OrderedDict()
-            title = user.get() + '\'s scores'
+            filename = user.get().replace(' ', '+')  # spaces in username replaced with pluses for formatting reasons
+            title = 'Levels passed by ' + user.get()
             label2 = 'Time achieved'
         else:
-            scoredict = SortedDict()
             filename = 'highscores'
             title = 'Highscores'
             label2 = 'User'
 
+        scoredict = OrderedDict()
         with open('scores/' + filename + '.score') as scorefile:  # opens the score file for reading
             for line in scorefile:  # does the following operations to all lines in the file
                 split = line.split()  # makes a list out of the line, list items separated by spaces in the file
-                scoredict[split[0]] = split[1]
-        if name != 'user':
+                scoredict[split[0]] = split[1]  # adds the items to a sorted dictionary
+        if name != 'user':  # sorts the dictionary by value if the name parameter isn't "user"
             scoredict = OrderedDict(sorted(scoredict.items(), key=lambda i: int(i[1]), reverse=True))
-        print(scoredict)
 
         scorelistd = ''
         stat2d = ''
@@ -288,10 +278,10 @@ def scoredisplay(name):
         scoreframe.grid(sticky='nwes')  # makes the frame fill the window
 
         ttk.Label(scoreframe, text=title).grid(row=0, columnspan=2)  # shows the username at the top
-        ttk.Label(scoreframe, text='Score').grid(row=1, sticky='w')  # labels the score column
+        ttk.Label(scoreframe, text='Levels passed').grid(row=1, sticky='w')  # labels the score column
         ttk.Label(scoreframe, text=label2).grid(row=1, column=1, sticky='w')  # labels the time column
 
-        ttk.Label(scoreframe, text=scorelistd).grid(row=2, sticky='w')  # displays all of the user's scores
+        ttk.Label(scoreframe, text=scorelistd, justify=CENTER).grid(row=2)  # displays all of the user's scores
         ttk.Label(scoreframe, text=stat2d).grid(row=2, column=1, sticky='w')  # displays the times of the scores
 
         spacing('score')
