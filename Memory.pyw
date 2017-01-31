@@ -7,12 +7,12 @@ import pip  # for installing additional modules
 
 print('Launched program')  # log message, printed in the console
 
-from sortedcontainers import SortedDict
-
-"""
-pip.main(['install', 'sortedcontainers'])
-print('Installed SortedContainers using pip')
-"""
+try:
+    from sortedcontainers import SortedDict
+except ModuleNotFoundError:
+    pip.main(['install', 'sortedcontainers'])
+    print('Installed SortedContainers using pip')
+    from sortedcontainers import SortedDict
 
 
 # creates the login screen
