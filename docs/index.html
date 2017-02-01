@@ -14,7 +14,7 @@
             padding-bottom: 100px;
             margin: 0 auto;
             background-color: rgb(175, 225, 255);
-            font-family: helvetica;
+            font-family: sans-serif;
         }
         h1, h2 {
             text-align: center;
@@ -110,7 +110,17 @@
 <p>
     After the parameter-dependent variables have been determined, the dictionary the scores will be temporarily stored in
     is set to an empty OrderedDict(). Unlike a normal dict, the OrderedDict has a determined order.
-    The file "scores/filename.scores" is opened.
+    The file "scores/[filename].score", for example "scores/lewski.score" or "scores/highscores.score", is opened.
+    Every line in the file is inserted into a list with the <b>split()</b> function so that spaces in the file separate list items.
+    For example, the line "lewski 11" would result in ['lewski', '11']. After this, the list is added into the OrderedDict
+    created earlier so that the first item in the list is the key and the second the value, for example ['lewski', '11']
+    would become {'lewski': '11'}.
+</p>
+<p>
+    After the dictionary has been created, if the "name" parameter is not "user", the dictionary is sorted by value
+    in descending order. The variables for the displayed scores and either the times or usernames are set as empty strings.
+    Then, for every item in the score dictionary, the value and a new line are added to the score variable.
+    Likewise, the key and a new line are added to the second variable.
 </p>
 </body>
 </html>
