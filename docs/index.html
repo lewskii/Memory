@@ -29,9 +29,7 @@
 </head>
 
 <body>
-<h1>
-    Memory
-</h1>
+<h1>Memory</h1>
 <p>
     Memory is a game created by Leevi Aaltonen and released under MIT license. The program was built with Python 3.6.0 and tkinter 8.6.
     Use the aforementioned versions of Python and tkinter to ensure functionality.
@@ -40,27 +38,24 @@
 </p>
 <hr />
 
-<h2>
-    Main Window
-</h2>
+<h2>Main Window</h2>
 <p>
     When the program is run, it creates a Tk window, gives it the title "Memory" and disables resizing of the window.
-    The log message "Launched program" is printed. Then the <b>login()</b> function is called to create the login screen,
+    Then the <b>login()</b> function is called to create the login screen,
     where the player can choose their username. The window's main event loop is initiated.
     Note that some variables are made global to easily allow usage in all functions.
 </p>
+
 <h3>Login Screen</h3>
 <p>
     When the <b>login()</b> function is called, the program tries to destroy the main menu frame, doing nothing if the frame doesn't exist.
-    The log message "Removed menu interface" is printed if the frame was destroyed.
     Then, a frame is created to hold the Tk widgets for the login screen. Three labels, an entry field and a button are created
-    and positioned in a grid inside the frame. The log message "Created login interface" is printed after the widgets have been created and positioned.
+    and positioned in a grid inside the frame.
 </p>
 <p>
     The variable <b>"user"</b> is set to <b>StringVar()</b>, which is a tkinter function that allows a string variable to be updated simultaneously
     for all widgets using it. A trace is set on the variable to call the <b>charlimit()</b> function every time the variable is updated.
     The function checks the length of the variable and sets the variable to its first 16 characters if it's longer than that.
-    The log message "Limited username length (16)" is printed if the user tries to enter more than 16 characters.
 </p>
 <p>
     The first label, positioned in the top left, displays the characters that cannot be used in the username.
@@ -71,16 +66,17 @@
     The <b>charlimit()</b> function, explained earlier, prevents entry of more than 16 characters.
     The Enter key is bound to the <b>checkname()</b> function for the entry field. If the Enter key is pressed while the field has focus,
     the function is called. If the username contains none of the forbidden characters and does not consist only of spaces,
-    the <b>menu()</b> function is called and the log message "Username is valid" is printed. Otherwise, the log message "Username is invalid" is printed.
+    the <b>menu()</b> function is called.
 </p>
 <p>
     The second label, on the left side of the entry field, indicates that a username should be entered.
     The button, on the right side of the entry field, is bound to the <b>checkname()</b> function, explained above.
     The third label, in the bottom left, indicates that the program was created by Leevi Aaltonen in 2017 and released under MIT license.
 </p>
+
 <h3>Main Menu</h3>
 <p>
-    When the <b>menu()</b> function is called, the login frame is destroyed and the "Removed login interface" log message is printed.
+    When the <b>menu()</b> function is called, the login frame is destroyed.
     Then, a frame is created to hold the widgets for the main menu. Two labels and four buttons are created.
     The first label labels the "Log out" and "Scores" buttons with the username, indicating that they're related to the user.
     The second label labels the "Play" and "Highscores" buttons with the text "Memory", indicating that they're related to the game.
@@ -88,15 +84,23 @@
     The "Scores" and "Highscores" buttons call the <b>scoredisplay()</b> function to display either the user's scores or all users' highscores.
     The "Play" button calls the <b>memory()</b> function, opening the game in a new window.
 </p>
-<h3>Score Display</h3>
+<hr>
+
+<h2>The Game</h2>
 <p>
-    Depending on the function's "name" parameter, some variables are assigned different values. The "Scores" button,
-    under the username, calls the <b>scoredisplay()</b> function with "user" as the "name" parameter. In this case:
+    When the <b>memory()</b> function is called,
+</p>
+<hr>
+
+<h2>Score Display</h2>
+<p>
+    Depending on the <b>scoredisplay()</b> function's "name" parameter, some variables are assigned different values. The "Scores" button,
+    under the username, calls the function with "user" as the "name" parameter. In this case:
 </p>
 <ul>
     <li>The file to get the displayed scores from is set to the username with spaces replaced with plus signs.</li>
-    <li>The window's title is set to "Levels passed by [user]", e.g. "Levels passed by Lewski".</li>
-    <li>The label for the second column is set to "Time achieved", meaning the date and time the score was achieved.</li>
+    <li>The title variable is set to "Levels passed by [user]", e.g. "Levels passed by Lewski".</li>
+    <li>The title variable for the second column is set to "Time achieved", meaning the date and time the score was achieved.</li>
 </ul>
 <p>
     If the "name" parameter is something other than "user", the variables will be assigned different values.
@@ -104,12 +108,12 @@
 </p>
 <ul>
     <li>The file to get the displayed scores from is set to "highscores".</li>
-    <li>The window's title is set to "Highscores".</li>
-    <li>The label for the second column is set to "User".</li>
+    <li>The title variable is set to "Highscores".</li>
+    <li>The title variable for the second column is set to "User".</li>
 </ul>
 <p>
     After the parameter-dependent variables have been determined, the dictionary the scores will be temporarily stored in
-    is set to an empty OrderedDict(). Unlike a normal dict, the OrderedDict has a determined order.
+    is set to an empty OrderedDict(). Unlike a normal dictionary, the OrderedDict has a determined order.
     The file "scores/[filename].score", for example "scores/lewski.score" or "scores/highscores.score", is opened.
     Every line in the file is inserted into a list with the <b>split()</b> function so that spaces in the file separate list items.
     For example, the line "lewski 11" would result in ['lewski', '11']. After this, the list is added into the OrderedDict
@@ -121,6 +125,17 @@
     in descending order. The variables for the displayed scores and either the times or usernames are set as empty strings.
     Then, for every item in the score dictionary, the value and a new line are added to the score variable.
     Likewise, the key and a new line are added to the second variable.
+</p>
+<p>
+    After the variables have been assigned, a window is created for the score display. The window's title is set
+    to the title variable, defined earlier, focus is set to the window and resizing is disabled. A frame is created
+    to hold the widgets and is set to fill the window. Five labels are created.
+</p>
+<p>
+    The first label, centered on the first row, is set to display the "title" variable.The left label on the second row
+    is set to display "Levels passed" and the right label is set to display the second column's title variable.
+    The bottom left label is set to display the string containing the scores and the bottom right label is set to
+    display the second variable, i.e. either the time or the username.
 </p>
 </body>
 </html>

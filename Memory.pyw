@@ -4,15 +4,17 @@ from random import randrange  # returns a random integer in a given range
 from os import makedirs, path  # for creating directories and displaying file paths
 from datetime import datetime  # dates and times
 from collections import OrderedDict  # an ordered dictionary
+from misctools import *  # a log function and a signature function, created by me
 
-print('Launched program')  # log message, printed in the console
+sign()  # prints my signature in the console
+log('Launched program')  # log message, printed in the console
 
 
 # creates the login screen
 def login():
     try:
         menuframe.destroy()
-        print('Removed menu interface')  # log message, printed in the console
+        log('Removed menu interface')  # log message, printed in the console
     except NameError:
         pass
 
@@ -44,7 +46,7 @@ def login():
     signature.grid(row=2, columnspan=3, sticky='sw')  # positions the signature
 
     spacing('login')  # creates space between all widgets
-    print('Created login interface')  # log message, printed in the console
+    log('Created login interface')  # log message, printed in the console
 
     userentry.bind('<Return>', lambda cn: checkname(user.get()))  # binds Enter to the menu function
 
@@ -58,23 +60,23 @@ def spacing(frame):
 def charlimit(s):
     if len(s) > 16:
         user.set(s[:16])
-        print('Limited username length (16)')  # log message, printed in the console
+        log('Limited username length (16)')  # log message, printed in the console
 
 
 # checks the username for forbidden characters
 def checkname(name):
     badchars = ['/', '\\', '*', '?', ':', '"', '<', '>', '|', '+']  # these characters can't be used in the username
     if set(name).isdisjoint(badchars) and name.replace(' ', '') != '':
-        print('Username is valid')  # log message, printed in the console
+        log('Username is valid')  # log message, printed in the console
         menu()  # creates the menu if the username doesn't contain any bad characters
     else:
-        print('Username is invalid')
+        log('Username is invalid')
 
 
 # creates the main menu
 def menu():
     loginframe.destroy()
-    print('Removed login interface')  # log message, printed in the console
+    log('Removed login interface')  # log message, printed in the console
 
     global menuframe  # lets the variable be used in all functions
     menuframe = ttk.Frame(mainwindow, padding='5 5 10 10')  # creates a new frame inside the main window
@@ -91,12 +93,12 @@ def menu():
     ttk.Button(menuframe, text='Highscores', command=lambda: scoredisplay('high')).grid(row=3, column=1)  # highscores
 
     spacing('menu')  # creates space between all widgets
-    print('Created menu interface')  # log message, printed in the console
+    log('Created menu interface')  # log message, printed in the console
 
 
 # memory game
 def memory():
-    print('Launched memory game')
+    log('Launched memory game')
     global string  # lets the variable be used in all functions
     global dstring
     global score
@@ -154,13 +156,13 @@ def memory():
     ansentry.bind('<Return>', lambda c: check())  # calls the check function when Enter is pressed
 
     spacing('memory')  # creates space between all widgets
-    print('Created memory game interface')  # log message, printed in the console
+    log('Created memory game interface')  # log message, printed in the console
 
 
 # starts a memory game round
 def start():
     if dstring.get() != '':
-        print('Started memory game round', score + 1)  # log message, printed in the console
+        log('Started memory game round ' + str(score + 1))  # log message, printed in the console
         dstring.set('')  # sets the displayed string to nothing to hide it
         ansentry['state'] = 'enabled'  # enables the answer field (disabled at the beginning)
         ansentry.focus_set()  # sets focus to the answer field
@@ -176,7 +178,7 @@ def check():
     global string  # lets the outside variable be changed from inside the function
     global score
     if answer.get().replace(' ', '') == string:  # all spaces are removed from the answer before comparing
-        print('Answer is correct')  # log message, printed in the console
+        log('Answer is correct')  # log message, printed in the console
         string += str(randrange(0, 10))  # adds another random number to the string
         dstring.set(string)  # assigns the new string to the displayed string
         answer.set('')  # empties the answer field
@@ -184,8 +186,8 @@ def check():
         dscore.set('Levels passed: ' + str(score))  # converts the score into a string with more clarity
         startbutton['state'] = 'enabled'  # enables the start button
     else:  # the game ends if the answer is incorrect
-        print('Answer is incorrect, game ends')  # log message, printed in the console
-        print('Score for', user.get() + ':', score)
+        log('Answer is incorrect, game ends')  # log message, printed in the console
+        log('Score for ' + user.get() + ': ' + str(score))
         startbutton['state'] = 'disabled'  # disables the start button
         answer.set('')  # empties the answer field
         memorywindow.unbind('<space>')  # unbinds the spacebar from the start function
@@ -214,8 +216,7 @@ def check():
         with open('scores/' + userfilename + '.score', 'a') as scorefile:  # opens the file for appending
             scoreline = datetime.now().ctime().replace(' ', '+') + ' ' + str(score) + '\n'  # sets the string to write
             scorefile.write(scoreline)  # writes the string to the user's score file
-        print('Saved the score to', path.dirname(path.realpath(__file__)) +
-              '\\scores\\' + userfilename + '.score')  # log message, printed in the console
+        log('Saved the score to ' + path.dirname(path.realpath(__file__)) + '\\scores\\' + userfilename + '.score')
 
         # saving highscores
         highscores = {}  # creates a dictionary for the highscores
@@ -226,7 +227,7 @@ def check():
         try:
             if int(highscores[userfilename]) < score:  # if the player's score exceeds their highscore...
                 highscores[userfilename] = score  # ...the old highscore is replaced
-                print('New highscore for', user.get() + ':', score)  # log message in the console
+                log('New highscore for ' + user.get() + ': ' + str(score))  # log message in the console
         except KeyError:
             highscores[userfilename] = score  # sets the player's highscore if it doesn't exist
         with open('scores/highscores.score', 'w') as highscorefile:  # opens the highscore file for writing
@@ -234,7 +235,7 @@ def check():
                 highscorefile.write(i + ' ' + str(highscores[i]) + '\n')  # writes the updated highscores to the file
 
         memorywindow.after(3500, memorywindow.destroy)  # closes the game window
-        print('Closing game window')  # log message, printed in the console
+        log('Closing game window')  # log message, printed in the console
 
 
 def scoredisplay(name):
@@ -260,8 +261,10 @@ def scoredisplay(name):
             for line in scorefile:  # does the following operations to all lines in the file
                 split = line.split()  # makes a list out of the line, list items separated by spaces in the file
                 scoredict[split[0]] = split[1]  # adds the items to a sorted dictionary
+        log('Imported the scores')
         if name != 'user':  # sorts the dictionary by value if the name parameter isn't "user"
             scoredict = OrderedDict(sorted(scoredict.items(), key=lambda i: int(i[1]), reverse=True))
+            log('Sorted the scores')
 
         scorelistd = ''
         stat2d = ''
@@ -279,10 +282,11 @@ def scoredisplay(name):
 
         ttk.Label(scoreframe, text=title).grid(row=0, columnspan=2)  # shows the username at the top
         ttk.Label(scoreframe, text='Levels passed').grid(row=1, sticky='w')  # labels the score column
-        ttk.Label(scoreframe, text=label2).grid(row=1, column=1, sticky='w')  # labels the time column
+        ttk.Label(scoreframe, text=label2).grid(row=1, column=1, sticky='w')  # labels the right column
 
         ttk.Label(scoreframe, text=scorelistd, justify=CENTER).grid(row=2)  # displays all of the user's scores
         ttk.Label(scoreframe, text=stat2d).grid(row=2, column=1, sticky='w')  # displays the times of the scores
+        log('Created score display interface')
 
         spacing('score')
     except FileNotFoundError:
@@ -295,4 +299,4 @@ mainwindow.resizable(0, 0)  # disables resizing of the window
 login()  # calls the function to create the login screen
 
 mainwindow.mainloop()  # starts the main event loop
-print('Program closing')
+log('Program closing')
