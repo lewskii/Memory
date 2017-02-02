@@ -31,10 +31,11 @@
 <body>
 <h1>Memory</h1>
 <p>
-    Memory is a game created by Leevi Aaltonen and released under MIT license. The program was built with Python 3.6.0 and tkinter 8.6.
+    Memory is a memory game created by Leevi Aaltonen and released under MIT license. The player has to memorize and enter
+    a growing string of numbers. The program was built with Python 3.6.0 and tkinter 8.6.
     Use the aforementioned versions of Python and tkinter to ensure functionality.
     It's recommended to run Memory.pyw when playing the game.
-    The program prints an event log into the Python console. Run Memory.py instead of Memory.pyw to enable the console.
+    The program prints an event log into the Python console and into a log file. Run Memory.py instead of Memory.pyw to enable the console.
 </p>
 <hr />
 
@@ -88,7 +89,51 @@
 
 <h2>The Game</h2>
 <p>
-    When the <b>memory()</b> function is called,
+    When the <b>memory()</b> function is called, a window is created. The window's title is set to "Memory", focus is set
+    to the window and resizing is disabled. A frame is created to hold the widgets and stretched to fill the window.
+    Some variables are given the value StringVar() to allow simultaneous and global changing of the value.
+    The string the player has to remember is set to a number from 0 to 9. The score is set to zero.
+    The "toptext" StringVar is set to the game's instructions. The "dstring" (displayed string) StringVar is set to the string defined earlier.
+    The "dscore" (displayed score) StringVar is set to "Levels passed: [score]", resulting in "Levels passed: 0" at the beginning.
+</p>
+<p>
+    Three labels, two buttons and an entry field are created. The label at the top is linked to the "toptext" StringVar.
+    The label on the left side of the second row is linked to the displayed string. The label at the bottom of the
+    window is linked to the displayed score. The Start button is placed on the right side of the second row and the
+    Enter button is placed below it. The entry field is placed on the left side of the "Enter" button and linked to the "answer" StringVar.
+    The entry field and Start button are disabled at the beginning.
+    The <b>start()</b> function is bound to the spacebar when the window has focus, but unbound when specifically the
+    entry field has focus. The <b>check()</b> function is bound to the Enter key when the entry field has focus.
+</p>
+<p>
+    When the <b>start()</b> function is called, the displayed string is set to nothing. The entry field and Enter button
+    are enabled and the Start button disabled. Focus is set to the entry field. The player must now type enter the string
+    from their memory.
+</p>
+<p>
+    When the <b>check()</b> function is called, focus is set to the game window and the entry field and Enter button are disabled.
+    The answer, with spaces removed, is compared with the string that was set earlier. The answer is set to nothing, emptying the answer field.
+</p>
+<p>
+    If the answer matches the string, another random number is added to the end of the string. The displayed string is set to the new string.
+    The score increases by one and the displayed score is set to show the new score. The Start button is enabled.
+</p>
+<p>
+    If the answer doesn't match the string, the spacebar is unbound from the <b>start()</b> function. The correct form
+    of the word "level" is chosen depending on whether or not the score is 1. The "userfilename" variable is set to
+    the username with spaces replaced by plus signs.
+</p>
+<p>
+    The program tries to create the "scores" folder, doing nothing if it exists. Then it tries to create the "[userfilename].score"
+    and "highscores.score" files in the folder, again doing nothing if the files exist. The user's score file is opened for appending.
+    The current time with spaces replaced by plus signs, the score and a new line are added to the file.
+</p>
+<p>
+    A dictionary is created for the highscores. The highscore file is opened for reading and every line is added to the
+    dictionary with the username as the key and the score as the value. If the user's current score is higher than the
+    user's score in the dictionary, the dictionary is updated. If there isn't an entry in the dictionary with the user's
+    name as the key, the entry is created. Every item in the dictionary is written into the highscore file.
+    Finally, the game window is set to close after 2 seconds.
 </p>
 <hr>
 

@@ -175,21 +175,19 @@ def check():
     memorywindow.focus_set()  # sets focus to the game window
     checkbutton['state'] = 'disabled'  # disables the check button
     ansentry['state'] = 'disabled'  # disables the answer field
-    global string  # lets the outside variable be changed from inside the function
+    answer.set('')  # empties the answer field
+    global string  # lets the outside variable be used in the function
     global score
     if answer.get().replace(' ', '') == string:  # all spaces are removed from the answer before comparing
         log('Answer is correct')  # log message, printed in the console
         string += str(randrange(0, 10))  # adds another random number to the string
         dstring.set(string)  # assigns the new string to the displayed string
-        answer.set('')  # empties the answer field
         score += 1  # adds 1 to the score
         dscore.set('Levels passed: ' + str(score))  # converts the score into a string with more clarity
         startbutton['state'] = 'enabled'  # enables the start button
     else:  # the game ends if the answer is incorrect
         log('Answer is incorrect, game ends')  # log message, printed in the console
         log('Score for ' + user.get() + ': ' + str(score))
-        startbutton['state'] = 'disabled'  # disables the start button
-        answer.set('')  # empties the answer field
         memorywindow.unbind('<space>')  # unbinds the spacebar from the start function
 
         # chooses the correct form of the word "level"
@@ -197,8 +195,6 @@ def check():
             levelstr = ' level.'
         else:
             levelstr = ' levels.'
-
-        toptext.set('Game over! You passed ' + str(score) + levelstr)  # changes the text
 
         userfilename = user.get().replace(' ', '+')  # spaces in username replaced with pluses for formatting reasons
 
@@ -226,15 +222,19 @@ def check():
                 highscores[split[0]] = split[1]  # adds the first two list items into the highscore dictionary
         try:
             if int(highscores[userfilename]) < score:  # if the player's score exceeds their highscore...
+                toptext.set('Game over! You passed ' + str(score) + levelstr + '\nNew highscore!')  # changes the text
                 highscores[userfilename] = score  # ...the old highscore is replaced
                 log('New highscore for ' + user.get() + ': ' + str(score))  # log message in the console
+            else:
+                toptext.set('Game over! You passed ' + str(score) + levelstr)  # changes the text
         except KeyError:
+            toptext.set('Game over! You passed ' + str(score) + levelstr)  # changes the text
             highscores[userfilename] = score  # sets the player's highscore if it doesn't exist
         with open('scores/highscores.score', 'w') as highscorefile:  # opens the highscore file for writing
             for i in highscores:
                 highscorefile.write(i + ' ' + str(highscores[i]) + '\n')  # writes the updated highscores to the file
 
-        memorywindow.after(3500, memorywindow.destroy)  # closes the game window
+        memorywindow.after(2000, memorywindow.destroy)  # closes the game window
         log('Closing game window')  # log message, printed in the console
 
 
@@ -271,6 +271,7 @@ def scoredisplay(name):
         for item in scoredict:
             scorelistd += str(scoredict[item]) + '\n'
             stat2d += item.replace('+', ' ') + '\n'
+        log('Converted values to display format')
 
         global scoreframe
         scorewindow = Toplevel()  # creates a window to display scores in
