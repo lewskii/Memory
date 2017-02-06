@@ -175,9 +175,10 @@ def check():
     memorywindow.focus_set()  # sets focus to the game window
     checkbutton['state'] = 'disabled'  # disables the check button
     ansentry['state'] = 'disabled'  # disables the answer field
-    answer.set('')  # empties the answer field
     global string  # lets the outside variable be used in the function
     global score
+    print(string)
+    print(answer.get())
     if answer.get().replace(' ', '') == string:  # all spaces are removed from the answer before comparing
         log('Answer is correct')  # log message, printed in the console
         string += str(randrange(0, 10))  # adds another random number to the string
@@ -236,6 +237,7 @@ def check():
 
         memorywindow.after(2000, memorywindow.destroy)  # closes the game window
         log('Closing game window')  # log message, printed in the console
+    answer.set('')  # empties the answer field
 
 
 def scoredisplay(name):
